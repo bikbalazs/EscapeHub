@@ -1,16 +1,16 @@
-@model IReadOnlyList<Room>
-@{ ViewData["Title"] = "Adminisztráció"; var users = (IReadOnlyList<User>)ViewBag.Users; }
+@model AdminOverviewDto
+@{ ViewData["Title"] = "Adminisztráció"; }
 <p class="eyebrow">EscapeHub kezelőfelület</p><h1>Adminisztráció</h1>
-<div class="admin-actions"><a class="button" asp-action="Room">+ Új szoba</a><a class="button secondary" asp-action="Users">+ Új felhasználó</a></div>
+<div class="admin-actions"><a class="button" asp-action="Room">+ Új szoba</a><a class="button secondary" asp-action="Users">+ Új felhasználó</a><a class="button secondary" asp-action="Bookings">Foglalások áttekintése</a></div>
 <h2>Szobák és időpontok</h2>
-@if (Model.Count == 0) { <p>Még nincs szoba. Hozd létre az elsőt!</p> }
-@foreach (var room in Model) {
+@if (Model.Rooms.Count == 0) { <p>Még nincs szoba. Hozd létre az elsőt!</p> }
+@foreach (var room in Model.Rooms) {
 <section class="admin-card">
-    <div class="admin-card-head"><div><h3>@room.Name @if (!room.IsActive) { <span class="pill">Inaktív</span> }</h3><p>@room.Capacity fő · @room.Description</p></div><a class="button small secondary" asp-action="Room" asp-route-id="@room.Id">Szerkesztés</a></div>
+    <div class="admin-card-head"><div><h3>@room.Name @if (!room.IsActive) { <span class="pill">Inaktív</span> }</h3><p>@room.Capacity fő · @room.SolveDurationMinutes perc játékidő + 30 perc előkészítés · @room.Description</p></div><a class="button small secondary" asp-action="Room" asp-route-id="@room.Id">Szerkesztés</a></div>
     @if (room.IsActive) {
         <div class="admin-slots"><a asp-action="Slot" asp-route-roomId="@room.Id" class="text-link">+ Időpont hozzáadása</a>
         @foreach (var slot in room.TimeSlots.OrderBy(x => x.StartsAtUtc)) {
-            var activeBooking = slot.Bookings.Any(x => x.CancelledAtUtc is null);
+            var activeBooking = slot.HasActiveBooking;
             <div class="slot-row"><span>@HungarianTime.FromUtc(slot.StartsAtUtc).ToString("yyyy. MMMM d. · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU")) – @HungarianTime.FromUtc(slot.EndsAtUtc).ToString("HH:mm") · @(activeBooking ? "Foglalt" : "Szabad") @(slot.IsActive ? "" : "· Inaktív")</span><div>
             <a class="text-link" asp-action="Slot" asp-route-roomId="@room.Id" asp-route-id="@slot.Id">@(slot.IsActive ? "Szerkesztés" : "Szerkesztés és aktiválás")</a>
             @if (slot.IsActive && !activeBooking) { <form asp-action="DeactivateSlot" method="post"><input type="hidden" name="id" value="@slot.Id"/><button class="link-button">Inaktiválás</button></form> }
@@ -24,7 +24,7 @@
 </section>
 }
 <h2>Felhasználók</h2><div class="admin-card">
-@foreach (var user in users) {
+@foreach (var user in Model.Users) {
     <div class="slot-row"><span>@user.Email <span class="pill">@(user.IsAdmin ? "Adminisztrátor" : "Felhasználó")</span></span><form asp-action="SetAdmin" method="post"><input type="hidden" name="id" value="@user.Id"/><input type="hidden" name="isAdmin" value="@(!user.IsAdmin)"/><button class="link-button">@(user.IsAdmin ? "Jogosultság visszavonása" : "Adminná tétel")</button></form></div>
 }
 </div>

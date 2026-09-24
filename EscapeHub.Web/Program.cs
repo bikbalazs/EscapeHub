@@ -1,21 +1,31 @@
-using System.Security.Claims;
 using System.Globalization;
-using EscapeHub.Core.Entities;
-using EscapeHub.Infrastructure.Data;
+using EscapeHub.Web.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<EscapeHubDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("EscapeHub") ?? "Data Source=escapehub.db"));
-builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+builder.Services.AddHttpContextAccessor();
+var apiBaseUrl = builder.Configuration["EscapeHub:ApiBaseUrl"] ?? "https://localhost:7036";
+builder.Services.AddHttpClient<EscapeHubApiClient>(client =>
+{
+    client.BaseAddress = new Uri(apiBaseUrl.EndsWith('/') ? apiBaseUrl : apiBaseUrl + "/");
+}).ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler { UseCookies = false });
+
+var dataProtectionPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "EscapeHub", "DataProtectionKeys");
+Directory.CreateDirectory(dataProtectionPath);
+builder.Services.AddDataProtection().PersistKeysToFileSystem(new DirectoryInfo(dataProtectionPath)).SetApplicationName("EscapeHub");
+builder.Services.AddAntiforgery(options =>
+{
+    options.HeaderName = "RequestVerificationToken";
+    options.Cookie.Name = ".EscapeHub.AntiForgery";
+});
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>
     {
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/Denied";
+        options.Cookie.Name = ".EscapeHub.Auth";
         options.Cookie.HttpOnly = true;
         options.Cookie.SameSite = SameSiteMode.Lax;
         options.SlidingExpiration = true;
@@ -30,41 +40,6 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     SupportedCultures = [hungarian],
     SupportedUICultures = [hungarian]
 });
-using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<EscapeHubDbContext>();
-    await db.Database.EnsureCreatedAsync();
-
-    var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
-    async Task EnsureConfiguredUserAsync(string? configuredEmail, string? password, bool isAdmin)
-    {
-        var email = configuredEmail?.Trim().ToLowerInvariant();
-        if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password) ||
-            await db.Users.AnyAsync(user => user.Email == email))
-        {
-            return;
-        }
-
-        var user = new User { Id = Guid.NewGuid(), Email = email, IsAdmin = isAdmin };
-        user.PasswordHash = passwordHasher.HashPassword(user, password);
-        db.Users.Add(user);
-        await db.SaveChangesAsync();
-    }
-
-    await EnsureConfiguredUserAsync(
-        app.Configuration["EscapeHub:AdminEmail"],
-        app.Configuration["EscapeHub:AdminPassword"],
-        isAdmin: true);
-
-    if (app.Environment.IsDevelopment())
-    {
-        await EnsureConfiguredUserAsync(
-            app.Configuration["EscapeHub:DemoUserEmail"],
-            app.Configuration["EscapeHub:DemoUserPassword"],
-            isAdmin: false);
-    }
-}
-
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -75,6 +50,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapControllers();
 app.MapControllerRoute(name: "default", pattern: "{controller=Rooms}/{action=Index}/{id?}");
 app.Run();
-

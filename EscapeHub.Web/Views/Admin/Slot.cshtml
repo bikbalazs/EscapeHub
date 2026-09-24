@@ -1,5 +1,27 @@
 @model TimeSlotFormModel
 @{ ViewData["Title"] = Model.Id is null ? "Új időpont" : "Időpont szerkesztése"; }
-<section class="form-card wide"><p class="eyebrow">@ViewBag.RoomName · időpont</p><h1>@ViewData["Title"]</h1><p>Az időpontokat UTC szerint adja meg. A látogatók a saját helyi idejükben látják.</p>
-<form asp-action="SaveSlot" method="post"><div asp-validation-summary="ModelOnly" class="validation"></div><input asp-for="Id" type="hidden"/><input asp-for="RoomId" type="hidden"/>
-<label asp-for="StartsAtUtc"></label><input asp-for="StartsAtUtc" type="datetime-local"/><label asp-for="EndsAtUtc"></label><input asp-for="EndsAtUtc" type="datetime-local"/><button class="button">Mentés</button> <a asp-action="Index">Mégse</a></form></section>
+<section class="form-card wide"><p class="eyebrow">@ViewBag.RoomName · időpont</p><h1>@ViewData["Title"]</h1><p>Az időpont kezdését UTC szerint adja meg. A befejezés automatikusan számítódik a szoba játékideje és 30 perc előkészítés alapján; a látogatók magyarországi helyi idő szerint látják.</p>
+<form asp-action="SaveSlot" method="post" id="slot-form" data-duration="@ViewBag.SolveDurationMinutes"><div asp-validation-summary="ModelOnly" class="validation"></div><input asp-for="Id" type="hidden"/><input asp-for="RoomId" type="hidden"/>
+<label asp-for="StartsAtUtc"></label><input asp-for="StartsAtUtc" asp-format="{0:yyyy-MM-ddTHH:mm}" type="datetime-local"/><span asp-validation-for="StartsAtUtc" class="validation"></span>
+<p class="muted">Várható befejezés: <output id="slot-end-preview">Válasszon kezdési időpontot</output></p>
+<button class="button">Mentés</button> <a asp-action="Index">Mégse</a></form></section>
+<script>
+(() => {
+    const form = document.getElementById("slot-form");
+    const start = document.getElementById("StartsAtUtc");
+    const preview = document.getElementById("slot-end-preview");
+    if (!form || !start || !preview) return;
+    const durationMinutes = Number(form.dataset.duration) + 30;
+    const formatter = new Intl.DateTimeFormat("hu-HU", {
+        year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC", timeZoneName: "short"
+    });
+    function updatePreview() {
+        if (!start.value) { preview.textContent = "Válasszon kezdési időpontot"; return; }
+        const end = new Date(start.value + "Z");
+        end.setUTCMinutes(end.getUTCMinutes() + durationMinutes);
+        preview.textContent = formatter.format(end);
+    }
+    start.addEventListener("input", updatePreview);
+    updatePreview();
+})();
+</script>

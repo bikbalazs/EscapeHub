@@ -7,6 +7,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\EscapeHub.Core\EscapeHub.Core.csproj" />
+    <ProjectReference Include="..\EscapeHub.Infrastructure\EscapeHub.Infrastructure.csproj" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 

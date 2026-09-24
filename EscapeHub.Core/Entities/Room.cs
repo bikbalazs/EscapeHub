@@ -6,6 +6,7 @@ public sealed class Room
     public string Name { get; set; } = "";
     public string Description { get; set; } = "";
     public int Capacity { get; set; }
+    public int SolveDurationMinutes { get; set; } = 60;
     public bool IsActive { get; set; } = true;
     public ICollection<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
 }

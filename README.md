@@ -4,13 +4,21 @@ Az EscapeHub egy magyar nyelvű, ASP.NET Core MVC-vel, Entity Framework Core-ral
 
 ## Futtatás helyben
 
-Telepítse a .NET 8 SDK-t, majd a tároló gyökérkönyvtárából futtassa:
+Telepítse a .NET 8 SDK-t. A weboldal minden adatot és műveletet az EscapeHub API-n keresztül ér el, ezért a `EscapeHub.Web` és az `EscapeHub.Api` projektet is futtatni kell.
+
+Visual Studio-ban állítsa be az `EscapeHub.Web` és az `EscapeHub.Api` projektet több indítási projektként, és mindkettőnél a HTTPS-es `Project` profilt válassza.
+
+Parancssorból indítsa el a két projektet külön PowerShell-ablakban, a tároló gyökérkönyvtárából:
 
 ```powershell
-dotnet run --project EscapeHub.Web
+dotnet run --project EscapeHub.Api --launch-profile https
 ```
 
-Az alkalmazás első indításkor létrehozza az `escapehub.db` adatbázisfájlt a futtatási könyvtárban. Fejlesztői módban két bemutató-fiók érhető el:
+```powershell
+dotnet run --project EscapeHub.Web --launch-profile https
+```
+
+Az alkalmazás első indításkor létrehozza az `escapehub.db` adatbázisfájlt a tároló gyökérkönyvtárában. Fejlesztői módban két bemutató-fiók érhető el:
 
 | Szerepkör | E-mail-cím | Jelszó |
 |---|---|---|
@@ -24,7 +32,16 @@ Egyéni rendszergazdai fiók beállításához használjon környezeti változó
 ```powershell
 $env:EscapeHub__AdminEmail = "admin@example.com"
 $env:EscapeHub__AdminPassword = "egy-hosszu-egyedi-jelszo"
-dotnet run --project EscapeHub.Web
+```
+
+Az API-t az egyik terminálban, a weboldalt pedig a környezeti változókat beállító másik terminálban indítsa el:
+
+```powershell
+dotnet run --project EscapeHub.Api --launch-profile https
+```
+
+```powershell
+dotnet run --project EscapeHub.Web --launch-profile https
 ```
 
 A felhasználók az oldalon is regisztrálhatnak. A rendszergazdai felület csak rendszergazdai jogosultságú fiókkal érhető el.
@@ -35,8 +52,10 @@ A felhasználók az oldalon is regisztrálhatnak. A rendszergazdai felület csak
 - Aktív szobák és jövőbeli időpontok böngészése.
 - Szabad, szobához rendelt időpont lefoglalása és a foglalás lemondása.
 - A rendszergazda szobákat vehet fel és szerkeszthet, időpontokat hirdethet meg és módosíthat, valamint felhasználókat hozhat létre és rendszergazdai jogosultságot adhat.
+- A szobák játékideje percben állítható; az időpont befejezése automatikusan a játékidő és további 30 perc előkészítési idő utánra kerül.
 - Aktív foglalással rendelkező időpont nem helyezhető át és nem inaktiválható. Az inaktivált szobák és időpontok az adatbázisban maradnak, így a foglalási előzmények megőrződnek.
 - A rendszergazdák az időpontokat UTC szerint adják meg; az oldal magyarországi helyi idő szerint jeleníti meg őket (Europe/Budapest).
 
-Az SQLite-adatbázis helyi fejlesztéshez és prototípushoz készült. Törlés előtt készítsen róla biztonsági másolatot; a jelenlegi beállítás `EnsureCreated`-et használ adatbázis-migrációk helyett.
+Az EscapeHub API kezeli az adatbázist, a fiókokat, a szobákat, az időpontokat és a foglalásokat. A Web alkalmazás szerveroldali HTTP-kérésekkel kommunikál az API-val; a két alkalmazás közös bejelentkezési kulcsokat használ.
 
+Az SQLite-adatbázis helyi fejlesztéshez és prototípushoz készült. Törlés előtt készítsen róla biztonsági másolatot; a jelenlegi beállítás `EnsureCreated`-et használ adatbázis-migrációk helyett.

@@ -19,6 +19,7 @@ public sealed class EscapeHubDbContext(DbContextOptions<EscapeHubDbContext> opti
 
         modelBuilder.Entity<Room>().Property(x => x.Name).HasMaxLength(120).IsRequired();
         modelBuilder.Entity<Room>().Property(x => x.Description).HasMaxLength(2000);
+        modelBuilder.Entity<Room>().Property(x => x.SolveDurationMinutes).HasDefaultValue(60);
         modelBuilder.Entity<Room>().HasMany(x => x.TimeSlots).WithOne(x => x.Room)
             .HasForeignKey(x => x.RoomId).OnDelete(DeleteBehavior.Restrict);
         modelBuilder.Entity<TimeSlot>().HasIndex(x => new { x.RoomId, x.StartsAtUtc }).IsUnique();

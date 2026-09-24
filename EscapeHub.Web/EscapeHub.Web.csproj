@@ -6,6 +6,5 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\EscapeHub.Core\EscapeHub.Core.csproj" />
-    <ProjectReference Include="..\EscapeHub.Infrastructure\EscapeHub.Infrastructure.csproj" />
   </ItemGroup>
 </Project>

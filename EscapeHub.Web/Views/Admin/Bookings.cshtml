@@ -1,0 +1,34 @@
+@model IReadOnlyList<BookingDto>
+@{ ViewData["Title"] = "Foglalások"; }
+
+<p class="eyebrow">EscapeHub kezelőfelület</p>
+<h1>Foglalások</h1>
+<p><a class="text-link" asp-action="Index">Vissza az adminisztrációhoz</a></p>
+
+@if (TempData["Message"] is string message) { <p class="notice" role="status">@message</p> }
+@if (Model.Count == 0) { <section class="empty-state"><h3>Még nincs foglalás</h3><p>Az új foglalások itt jelennek meg.</p></section> }
+else
+{
+    <div class="booking-list">
+    @foreach (var booking in Model)
+    {
+        var active = booking.CancelledAtUtc is null;
+        <article class="booking-card">
+            <div>
+                <p class="eyebrow">@booking.RoomName</p>
+                <h3>@HungarianTime.FromUtc(booking.StartsAtUtc).ToString("yyyy. MMMM d. (dddd) · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU")) – @HungarianTime.FromUtc(booking.EndsAtUtc).ToString("HH:mm")</h3>
+                <p>Foglaló: @booking.CustomerEmail</p>
+                <span class="@(active ? "status-active" : "status-cancelled")">@(active ? "Aktív" : "Lemondva")</span>
+                @if (!active) { <p class="muted">Lemondás ideje: @HungarianTime.FromUtc(booking.CancelledAtUtc!.Value).ToString("yyyy. MMMM d. · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU"))</p> }
+            </div>
+            @if (active)
+            {
+                <form asp-action="CancelBooking" method="post" onsubmit="return confirm('Biztosan lemondod ezt a foglalást?');">
+                    <input type="hidden" name="id" value="@booking.Id" />
+                    <button class="button secondary">Foglalás lemondása</button>
+                </form>
+            }
+        </article>
+    }
+    </div>
+}

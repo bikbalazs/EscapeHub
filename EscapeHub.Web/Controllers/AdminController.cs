@@ -1,123 +1,115 @@
-using EscapeHub.Core.Entities;
-using EscapeHub.Infrastructure.Data;
+using EscapeHub.Core.DTOs;
 using EscapeHub.Web.Models;
+using EscapeHub.Web.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace EscapeHub.Web.Controllers;
 
 [Authorize(Roles = "Admin")]
-public sealed class AdminController(EscapeHubDbContext db, IPasswordHasher<User> passwordHasher) : Controller
+public sealed class AdminController(EscapeHubApiClient api) : Controller
 {
     public async Task<IActionResult> Index()
     {
-        ViewBag.Users = await db.Users.AsNoTracking().OrderBy(x => x.Email).ToListAsync();
-        return View(await db.Rooms.Include(x => x.TimeSlots).ThenInclude(x => x.Bookings)
-            .OrderBy(x => x.Name).ToListAsync());
+        var result = await api.GetAsync<AdminOverviewDto>("api/admin/overview");
+        if (!result.Succeeded) return ApiFailure(result, nameof(Index));
+        return View(result.Value ?? new AdminOverviewDto([], []));
     }
 
     [HttpGet]
-    public IActionResult Room(int? id) => View("Room", id is null ? new RoomFormModel() :
-        db.Rooms.Where(x => x.Id == id).Select(x => new RoomFormModel { Id = x.Id, Name = x.Name, Description = x.Description, Capacity = x.Capacity }).FirstOrDefault() ?? new RoomFormModel());
+    public async Task<IActionResult> Bookings()
+    {
+        var result = await api.GetAsync<IReadOnlyList<BookingDto>>("api/admin/bookings");
+        if (!result.Succeeded) return ApiFailure(result, nameof(Bookings));
+        return View(result.Value ?? Array.Empty<BookingDto>());
+    }
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public async Task<IActionResult> CancelBooking(int id)
+    {
+        var result = await api.PostAsync<object>($"api/admin/bookings/{id}/cancel");
+        TempData["Message"] = result.Succeeded ? "A foglalást lemondtuk." : result.Message ?? "Nem sikerült lemondani a foglalást.";
+        return RedirectToAction(nameof(Bookings));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Room(int? id)
+    {
+        if (id is null) return View("Room", new RoomFormModel());
+        var result = await api.GetAsync<RoomDto>($"api/admin/rooms/{id}");
+        if (!result.Succeeded || result.Value is null) return result.StatusCode == HttpStatusCode.NotFound ? NotFound() : ApiFailure(result, nameof(Index));
+        return View("Room", new RoomFormModel
+        {
+            Id = id,
+            Name = result.Value.Name,
+            Description = result.Value.Description,
+            Capacity = result.Value.Capacity,
+            SolveDurationMinutes = result.Value.SolveDurationMinutes
+        });
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> SaveRoom(RoomFormModel model)
     {
         if (!ModelState.IsValid) return View("Room", model);
-        if (model.Id is null) db.Rooms.Add(new Room { Name = model.Name.Trim(), Description = model.Description.Trim(), Capacity = model.Capacity });
-        else
+        var body = new RoomSaveRequest
         {
-            var room = await db.Rooms.FindAsync(model.Id);
-            if (room is null) return NotFound();
-            room.Name = model.Name.Trim(); room.Description = model.Description.Trim(); room.Capacity = model.Capacity;
-        }
-        await db.SaveChangesAsync();
+            Name = model.Name.Trim(),
+            Description = model.Description.Trim(),
+            Capacity = model.Capacity,
+            SolveDurationMinutes = model.SolveDurationMinutes
+        };
+        var result = model.Id is null
+            ? await api.PostAsync<object>("api/admin/rooms", body)
+            : await api.PutAsync<object>($"api/admin/rooms/{model.Id}", body);
+        if (!result.Succeeded) { result.AddErrorsTo(ModelState); return View("Room", model); }
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeactivateRoom(int id)
-    {
-        var room = await db.Rooms.Include(x => x.TimeSlots).SingleOrDefaultAsync(x => x.Id == id);
-        if (room is null) return NotFound();
-        var hasActiveBookings = await db.TimeSlots
-            .Where(slot => slot.RoomId == id)
-            .SelectMany(slot => slot.Bookings)
-            .AnyAsync(booking => booking.CancelledAtUtc == null);
-        if (hasActiveBookings)
-        {
-            TempData["Message"] = "A szoba nem inaktiválható, mert aktív foglalás tartozik hozzá. Előbb mondja le a foglalást.";
-            return RedirectToAction(nameof(Index));
-        }
-        room.IsActive = false;
-        foreach (var slot in room.TimeSlots) slot.IsActive = false;
-        await db.SaveChangesAsync();
-        TempData["Message"] = "A szobát inaktiváltuk; a korábbi foglalások megmaradtak.";
-        return RedirectToAction(nameof(Index));
-    }
+    public async Task<IActionResult> DeactivateRoom(int id) => AdminAction(await api.PostAsync<object>($"api/admin/rooms/{id}/deactivate"));
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> ActivateRoom(int id)
-    {
-        var room = await db.Rooms.FindAsync(id);
-        if (room is null) return NotFound();
-        room.IsActive = true;
-        await db.SaveChangesAsync();
-        TempData["Message"] = "A szobát újra aktiváltuk. Az időpontokat külön kell aktiválni.";
-        return RedirectToAction(nameof(Index));
-    }
+    public async Task<IActionResult> ActivateRoom(int id) => AdminAction(await api.PostAsync<object>($"api/admin/rooms/{id}/activate"));
 
     [HttpGet]
     public async Task<IActionResult> Slot(int roomId, int? id)
     {
-        var room = await db.Rooms.FindAsync(roomId);
-        if (room is null) return NotFound();
-        ViewBag.RoomName = room.Name; ViewBag.RoomId = room.Id;
-        var model = id is null ? new TimeSlotFormModel { RoomId = roomId, StartsAtUtc = DateTime.UtcNow.AddDays(1), EndsAtUtc = DateTime.UtcNow.AddDays(1).AddHours(1) }
-            : await db.TimeSlots.Where(x => x.Id == id && x.RoomId == roomId).Select(x => new TimeSlotFormModel { Id = x.Id, RoomId = x.RoomId, StartsAtUtc = x.StartsAtUtc, EndsAtUtc = x.EndsAtUtc }).FirstOrDefaultAsync();
-        return model is null ? NotFound() : View("Slot", model);
+        var roomResult = await api.GetAsync<RoomDto>($"api/admin/rooms/{roomId}");
+        if (!roomResult.Succeeded || roomResult.Value is null) return roomResult.StatusCode == HttpStatusCode.NotFound ? NotFound() : ApiFailure(roomResult, nameof(Index));
+        ViewBag.RoomName = roomResult.Value.Name;
+        ViewBag.SolveDurationMinutes = roomResult.Value.SolveDurationMinutes;
+        var model = id is null
+            ? new TimeSlotFormModel { RoomId = roomId, StartsAtUtc = DateTime.UtcNow.AddDays(1) }
+            : await LoadSlot(roomId, id.Value);
+        if (model is null) return NotFound();
+        ViewBag.RoomId = roomId;
+        return View("Slot", model);
     }
 
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> SaveSlot(TimeSlotFormModel model)
     {
-        var room = await db.Rooms.FindAsync(model.RoomId);
-        if (room is null) return NotFound();
-        if (!room.IsActive) return BadRequest();
-        ViewBag.RoomName = room.Name; ViewBag.RoomId = room.Id;
+        var roomResult = await api.GetAsync<RoomDto>($"api/admin/rooms/{model.RoomId}");
+        if (!roomResult.Succeeded || roomResult.Value is null) return roomResult.StatusCode == HttpStatusCode.NotFound ? NotFound() : ApiFailure(roomResult, nameof(Index));
+        ViewBag.RoomName = roomResult.Value.Name;
+        ViewBag.SolveDurationMinutes = roomResult.Value.SolveDurationMinutes;
+        ViewBag.RoomId = model.RoomId;
         model.StartsAtUtc = DateTime.SpecifyKind(model.StartsAtUtc, DateTimeKind.Utc);
-        model.EndsAtUtc = DateTime.SpecifyKind(model.EndsAtUtc, DateTimeKind.Utc);
-        if (model.EndsAtUtc <= model.StartsAtUtc || model.StartsAtUtc <= DateTime.UtcNow)
-            ModelState.AddModelError(string.Empty, "A kezdés legyen a jövőben, a befejezés pedig a kezdés után.");
-        var slot = model.Id is null ? null : await db.TimeSlots.Include(x => x.Bookings).SingleOrDefaultAsync(x => x.Id == model.Id && x.RoomId == model.RoomId);
-        if (model.Id is not null && slot is null) return NotFound();
-        if (slot?.Bookings.Any(x => x.CancelledAtUtc is null) == true &&
-            (slot.StartsAtUtc != model.StartsAtUtc || slot.EndsAtUtc != model.EndsAtUtc))
-            ModelState.AddModelError(string.Empty, "Foglalt időpont ideje nem módosítható. Előbb mondja le a foglalást.");
+        if (model.StartsAtUtc <= DateTime.UtcNow)
+            ModelState.AddModelError(nameof(model.StartsAtUtc), "A kezdés legyen a jövőben.");
         if (!ModelState.IsValid) return View("Slot", model);
-        if (slot is null) db.TimeSlots.Add(new TimeSlot { RoomId = model.RoomId, StartsAtUtc = model.StartsAtUtc, EndsAtUtc = model.EndsAtUtc });
-        else { slot.StartsAtUtc = model.StartsAtUtc; slot.EndsAtUtc = model.EndsAtUtc; slot.IsActive = true; }
-        try { await db.SaveChangesAsync(); }
-        catch (DbUpdateException) { ModelState.AddModelError(string.Empty, "Már létezik időpont ehhez a szobához ezzel a kezdéssel."); return View("Slot", model); }
+        var body = new TimeSlotSaveRequest { RoomId = model.RoomId, StartsAtUtc = model.StartsAtUtc };
+        var result = model.Id is null
+            ? await api.PostAsync<object>("api/admin/slots", body)
+            : await api.PutAsync<object>($"api/admin/slots/{model.Id}", body);
+        if (!result.Succeeded) { result.AddErrorsTo(ModelState); return View("Slot", model); }
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeactivateSlot(int id)
-    {
-        var slot = await db.TimeSlots.FindAsync(id);
-        if (slot is null) return NotFound();
-        if (await db.Bookings.AnyAsync(x => x.TimeSlotId == id && x.CancelledAtUtc == null))
-        {
-            TempData["Message"] = "Foglalt időpont nem törölhető. Előbb mondja le a foglalást.";
-            return RedirectToAction(nameof(Index));
-        }
-        slot.IsActive = false;
-        await db.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
-    }
+    public async Task<IActionResult> DeactivateSlot(int id) => AdminAction(await api.PostAsync<object>($"api/admin/slots/{id}/deactivate"));
 
     [HttpGet]
     public IActionResult Users() => View("User", new AdminUserModel());
@@ -126,27 +118,36 @@ public sealed class AdminController(EscapeHubDbContext db, IPasswordHasher<User>
     public async Task<IActionResult> SaveUser(AdminUserModel model)
     {
         if (!ModelState.IsValid) return View("User", model);
-        var email = model.Email.Trim().ToLowerInvariant();
-        if (await db.Users.AnyAsync(x => x.Email == email))
+        var result = await api.PostAsync<object>("api/admin/users", new AdminUserCreateRequest
         {
-            ModelState.AddModelError(nameof(model.Email), "Ezzel az e-mail-címmel már létezik felhasználó.");
-            return View("User", model);
-        }
-        var user = new User { Id = Guid.NewGuid(), Email = email, IsAdmin = model.IsAdmin };
-        user.PasswordHash = passwordHasher.HashPassword(user, model.Password);
-        db.Users.Add(user);
-        await db.SaveChangesAsync();
+            Email = model.Email.Trim(), Password = model.Password, IsAdmin = model.IsAdmin
+        });
+        if (!result.Succeeded) { result.AddErrorsTo(ModelState); return View("User", model); }
         TempData["Message"] = "A felhasználó létrejött.";
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> SetAdmin(Guid id, bool isAdmin)
+    public async Task<IActionResult> SetAdmin(Guid id, bool isAdmin) =>
+        AdminAction(await api.PostAsync<object>($"api/admin/users/{id}/role", new SetAdminRequest { IsAdmin = isAdmin }));
+
+    private async Task<TimeSlotFormModel?> LoadSlot(int roomId, int id)
     {
-        var user = await db.Users.FindAsync(id);
-        if (user is null) return NotFound();
-        user.IsAdmin = isAdmin;
-        await db.SaveChangesAsync();
+        var result = await api.GetAsync<TimeSlotDto>($"api/admin/rooms/{roomId}/slots/{id}");
+        return result.Succeeded && result.Value is not null
+            ? new TimeSlotFormModel { Id = id, RoomId = roomId, StartsAtUtc = result.Value.StartsAtUtc }
+            : null;
+    }
+
+    private IActionResult AdminAction(ApiCallResult<object> result)
+    {
+        if (!result.Succeeded) TempData["Message"] = result.Message ?? "A művelet nem sikerült.";
         return RedirectToAction(nameof(Index));
+    }
+
+    private IActionResult ApiFailure<T>(ApiCallResult<T> result, string returnAction)
+    {
+        TempData["Message"] = result.Message ?? "Az API nem érhető el. Ellenőrizze, hogy fut-e az API projekt.";
+        return RedirectToAction(returnAction);
     }
 }

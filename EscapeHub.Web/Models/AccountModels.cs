@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using EscapeHub.Core.Validation;
 
 namespace EscapeHub.Web.Models;
 
@@ -41,16 +42,17 @@ public sealed class RoomFormModel
     [Range(1, 50, ErrorMessage = "A férőhely 1 és 50 közötti legyen.")]
     [Display(Name = "Férőhely")]
     public int Capacity { get; set; } = 4;
+    [AllowedSolveDuration(ErrorMessage = "Válasszon 60, 90 vagy 120 perces játékidőt.")]
+    [Display(Name = "Játékidő (perc)")]
+    public int SolveDurationMinutes { get; set; } = 60;
 }
 
 public sealed class TimeSlotFormModel
 {
     public int? Id { get; set; }
     public int RoomId { get; set; }
-    [Required, Display(Name = "Kezdés (UTC)")]
+    [Required, Display(Name = "Kezdés (UTC)"), DisplayFormat(DataFormatString = "{0:yyyy-MM-ddTHH:mm}", ApplyFormatInEditMode = true)]
     public DateTime StartsAtUtc { get; set; }
-    [Required, Display(Name = "Befejezés (UTC)")]
-    public DateTime EndsAtUtc { get; set; }
 }
 
 public sealed class AdminUserModel
