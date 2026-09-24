@@ -1,6 +1,9 @@
 # Build output
 **/bin/
 **/obj/
+*.db
+*.db-shm
+*.db-wal
 
 # Visual Studio
 .vs/

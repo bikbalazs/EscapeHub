@@ -1,0 +1,5 @@
+@model AdminUserModel
+@{ ViewData["Title"] = "Új felhasználó"; }
+<section class="form-card"><p class="eyebrow">Adminisztráció</p><h1>Új felhasználó</h1><form asp-action="SaveUser" method="post"><div asp-validation-summary="ModelOnly" class="validation"></div>
+<label asp-for="Email"></label><input asp-for="Email" autocomplete="email"/><span asp-validation-for="Email" class="validation"></span><label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password"/><span asp-validation-for="Password" class="validation"></span>
+<label class="check"><input asp-for="IsAdmin"/> Adminisztrátori jogosultság</label><button class="button">Felhasználó létrehozása</button></form></section>

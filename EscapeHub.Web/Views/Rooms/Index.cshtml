@@ -1,0 +1,14 @@
+@model IReadOnlyList<Room>
+@{ ViewData["Title"] = "Szabadulószobák"; }
+<section class="hero"><div><p class="eyebrow">Élmény, amit együtt oldotok meg</p><h1>Találd meg a következő<br /><em>közös kalandotokat.</em></h1><p>Válassz szobát és foglalj egy szabad időpontot néhány kattintással.</p></div><div class="hero-mark">ESC<br /><strong>01</strong></div></section>
+<div class="section-heading"><div><p class="eyebrow">Fedezd fel</p><h2>Szabadulószobák</h2></div><span>@Model.Count szoba</span></div>
+@if (Model.Count == 0) { <section class="empty-state"><h3>Hamarosan érkeznek az első szobák</h3><p>Az adminisztrátor még nem adott hozzá foglalható szobát.</p></section> }
+<div class="room-grid">
+@foreach (var room in Model) {
+    <article class="room-card"><div class="room-art"><span>ESCAPEHUB</span><b>@room.Id.ToString("00")</b></div><div class="room-content"><div class="room-meta"><span>⏱ Kaland</span><span>♙ @room.Capacity fő</span></div><h3>@room.Name</h3><p>@room.Description</p>
+    <div class="slots"><h4>Választható időpontok</h4>
+    @if (room.TimeSlots.Count == 0) { <p class="muted">Jelenleg nincs meghirdetett időpont.</p> }
+    else { @foreach (var slot in room.TimeSlots.OrderBy(x => x.StartsAtUtc)) { var taken = slot.Bookings.Any(x => x.CancelledAtUtc is null); <div class="slot-row"><span>@HungarianTime.FromUtc(slot.StartsAtUtc).ToString("yyyy. MMMM d. (dddd) · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU"))</span>@if (taken) { <span class="pill">Foglalt</span> } else if (User.Identity?.IsAuthenticated == true) { <form asp-action="Book" method="post"><input type="hidden" name="slotId" value="@slot.Id"/><button class="button small">Foglalás</button></form> } else { <a class="button small" asp-controller="Account" asp-action="Login">Belépés a foglaláshoz</a> }</div> } }
+    </div></div></article>
+}
+</div>

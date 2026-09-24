@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="hu">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] – EscapeHub</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header class="site-header"><a class="brand" asp-controller="Rooms" asp-action="Index">EscapeHub</a>
+    <nav><a asp-controller="Rooms" asp-action="Index">Szobák</a>
+    @if (User.Identity?.IsAuthenticated == true) { <a asp-controller="Rooms" asp-action="MyBookings">Foglalásaim</a> }
+    @if (User.IsInRole("Admin")) { <a asp-controller="Admin" asp-action="Index">Adminisztráció</a> }
+    </nav>
+    <div class="account">
+    @if (User.Identity?.IsAuthenticated == true) { <span>@User.Identity.Name</span><form asp-controller="Account" asp-action="Logout" method="post"><button class="link-button">Kilépés</button></form> }
+    else { <a asp-controller="Account" asp-action="Login">Belépés</a><a class="button small" asp-controller="Account" asp-action="Register">Regisztráció</a> }
+    </div>
+</header>
+<main class="container">
+    @if (TempData["Message"] is string message) { <div class="notice">@message</div> }
+    @RenderBody()
+</main>
+<footer>EscapeHub <span>•</span> Szabadulószoba-foglalás</footer>
+</body>
+</html>

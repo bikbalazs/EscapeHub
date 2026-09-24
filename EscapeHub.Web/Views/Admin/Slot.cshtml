@@ -1,0 +1,5 @@
+@model TimeSlotFormModel
+@{ ViewData["Title"] = Model.Id is null ? "Új időpont" : "Időpont szerkesztése"; }
+<section class="form-card wide"><p class="eyebrow">@ViewBag.RoomName · időpont</p><h1>@ViewData["Title"]</h1><p>Az időpontokat UTC szerint adja meg. A látogatók a saját helyi idejükben látják.</p>
+<form asp-action="SaveSlot" method="post"><div asp-validation-summary="ModelOnly" class="validation"></div><input asp-for="Id" type="hidden"/><input asp-for="RoomId" type="hidden"/>
+<label asp-for="StartsAtUtc"></label><input asp-for="StartsAtUtc" type="datetime-local"/><label asp-for="EndsAtUtc"></label><input asp-for="EndsAtUtc" type="datetime-local"/><button class="button">Mentés</button> <a asp-action="Index">Mégse</a></form></section>

@@ -1,0 +1,7 @@
+@model RegisterModel
+@{ ViewData["Title"] = "Regisztráció"; }
+<section class="form-card"><p class="eyebrow">Üdvözöljük az EscapeHubon</p><h1>Fiók létrehozása</h1>
+<form asp-action="Register" method="post"><div asp-validation-summary="ModelOnly" class="validation"></div>
+<label asp-for="Email"></label><input asp-for="Email" autocomplete="email" /><span asp-validation-for="Email" class="validation"></span>
+<label asp-for="Password"></label><input asp-for="Password" autocomplete="new-password" /><span asp-validation-for="Password" class="validation"></span>
+<button class="button">Regisztráció</button></form><p>Már van fiókja? <a asp-action="Login">Lépjen be</a>.</p></section>

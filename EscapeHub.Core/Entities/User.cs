@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace EscapeHub.Core.Entities;
 
-namespace EscapeHub.Core.Entities
+public sealed class User
 {
-    internal class User
-    {
-    }
+    public Guid Id { get; set; }
+    public string Email { get; set; } = "";
+    public string PasswordHash { get; set; } = "";
+    public bool IsAdmin { get; set; }
+    public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
 }

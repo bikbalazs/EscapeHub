@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace EscapeHub.Core.Entities;
 
-namespace EscapeHub.Core.Entities
+public sealed class Room
 {
-    internal class Room
-    {
-    }
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public string Description { get; set; } = "";
+    public int Capacity { get; set; }
+    public bool IsActive { get; set; } = true;
+    public ICollection<TimeSlot> TimeSlots { get; set; } = new List<TimeSlot>();
 }

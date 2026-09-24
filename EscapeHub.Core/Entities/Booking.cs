@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+namespace EscapeHub.Core.Entities;
 
-namespace EscapeHub.Core.Entities
+public sealed class Booking
 {
-    internal class Booking
-    {
-    }
+    public int Id { get; set; }
+    public int TimeSlotId { get; set; }
+    public TimeSlot? TimeSlot { get; set; }
+    public Guid UserId { get; set; }
+    public User? User { get; set; }
+    public DateTime CreatedAtUtc { get; set; }
+    public DateTime? CancelledAtUtc { get; set; }
 }

@@ -1,0 +1,6 @@
+@model RoomFormModel
+@{ ViewData["Title"] = Model.Id is null ? "Új szoba" : "Szoba szerkesztése"; }
+<section class="form-card wide"><p class="eyebrow">Adminisztráció</p><h1>@ViewData["Title"]</h1><form asp-action="SaveRoom" method="post"><div asp-validation-summary="ModelOnly" class="validation"></div>
+<input asp-for="Id" type="hidden"/><label asp-for="Name"></label><input asp-for="Name"/><span asp-validation-for="Name" class="validation"></span>
+<label asp-for="Description"></label><textarea asp-for="Description" rows="4"></textarea><label asp-for="Capacity"></label><input asp-for="Capacity"/><span asp-validation-for="Capacity" class="validation"></span>
+<button class="button">Mentés</button> <a asp-action="Index">Mégse</a></form></section>

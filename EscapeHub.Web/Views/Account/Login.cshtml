@@ -1,0 +1,7 @@
+@model LoginModel
+@{ ViewData["Title"] = "Belépés"; }
+<section class="form-card"><p class="eyebrow">Jó újra látni</p><h1>Belépés</h1>
+<form asp-action="Login" method="post"><div asp-validation-summary="ModelOnly" class="validation"></div>
+<label asp-for="Email"></label><input asp-for="Email" autocomplete="email" />
+<label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" />
+<button class="button">Belépés</button></form><p>Még nincs fiókja? <a asp-action="Register">Regisztráljon</a>.</p></section>
