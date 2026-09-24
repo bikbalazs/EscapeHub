@@ -42,6 +42,15 @@ public sealed class AdminController(EscapeHubDbContext db, IPasswordHasher<User>
     {
         var room = await db.Rooms.Include(x => x.TimeSlots).SingleOrDefaultAsync(x => x.Id == id);
         if (room is null) return NotFound();
+        var hasActiveBookings = await db.TimeSlots
+            .Where(slot => slot.RoomId == id)
+            .SelectMany(slot => slot.Bookings)
+            .AnyAsync(booking => booking.CancelledAtUtc == null);
+        if (hasActiveBookings)
+        {
+            TempData["Message"] = "A szoba nem inaktiválható, mert aktív foglalás tartozik hozzá. Előbb mondja le a foglalást.";
+            return RedirectToAction(nameof(Index));
+        }
         room.IsActive = false;
         foreach (var slot in room.TimeSlots) slot.IsActive = false;
         await db.SaveChangesAsync();
