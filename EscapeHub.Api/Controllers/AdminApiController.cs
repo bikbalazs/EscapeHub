@@ -133,7 +133,7 @@ public sealed class AdminApiController(
     [HttpPut("slots/{id:int}"), ValidateAntiForgeryToken]
     public async Task<IActionResult> UpdateSlot(int id, TimeSlotSaveRequest request)
     {
-        var (room, validation) = await ValidateSlotRequest(request);
+        var (room, validation) = await ValidateSlotRequest(request, id);
         if (validation is not null) return validation;
 
         var slot = await db.TimeSlots.Include(item => item.Bookings)
@@ -219,7 +219,9 @@ public sealed class AdminApiController(
         return NoContent();
     }
 
-    private async Task<(Room? Room, IActionResult? Error)> ValidateSlotRequest(TimeSlotSaveRequest request)
+    private async Task<(Room? Room, IActionResult? Error)> ValidateSlotRequest(
+        TimeSlotSaveRequest request,
+        int? slotIdBeingUpdated = null)
     {
         var room = await db.Rooms.FindAsync(request.RoomId);
         if (room is null) return (null, NotFound(new { message = "A szoba nem található." }));
@@ -232,6 +234,21 @@ public sealed class AdminApiController(
             {
                 [string.Empty] = ["A kezdés legyen a jövőben."]
             })));
+        }
+
+        var end = CalculateEndTime(start, room.SolveDurationMinutes);
+        var overlapsAnotherActiveSlot = await db.TimeSlots.AnyAsync(slot =>
+            slot.RoomId == request.RoomId &&
+            slot.IsActive &&
+            slot.Id != slotIdBeingUpdated &&
+            start < slot.EndsAtUtc &&
+            end > slot.StartsAtUtc);
+        if (overlapsAnotherActiveSlot)
+        {
+            return (null, Conflict(new
+            {
+                message = "Az időpont ütközik a szoba egy másik aktív időpontjával. Válasszon másik kezdési időt."
+            }));
         }
 
         return (room, null);
