@@ -23,6 +23,19 @@ public sealed class RoomsApiController(EscapeHubDbContext db) : ControllerBase
         return Ok(rooms.Select(ToRoomDto).ToList());
     }
 
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<RoomDto>> GetAvailableRoom(int id)
+    {
+        var now = DateTime.UtcNow;
+        var room = await db.Rooms.AsNoTracking()
+            .Where(item => item.Id == id && item.IsActive)
+            .Include(item => item.TimeSlots.Where(slot => slot.IsActive && slot.EndsAtUtc > now))
+                .ThenInclude(slot => slot.Bookings)
+            .SingleOrDefaultAsync();
+
+        return room is null ? NotFound() : Ok(ToRoomDto(room));
+    }
+
     internal static RoomDto ToRoomDto(EscapeHub.Core.Entities.Room room) =>
         new(room.Id, room.Name, room.Description, room.Capacity, room.SolveDurationMinutes, room.IsActive,
             room.TimeSlots.OrderBy(slot => slot.StartsAtUtc).Select(slot =>

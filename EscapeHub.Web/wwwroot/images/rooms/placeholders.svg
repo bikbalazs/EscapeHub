@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="stone" x2="0" y2="1"><stop stop-color="#34453f"/><stop offset="1" stop-color="#121d1b"/></linearGradient>
+    <linearGradient id="torch" x2="0" y2="1"><stop stop-color="#fff0a5"/><stop offset="1" stop-color="#ed7838"/></linearGradient>
+    <linearGradient id="wood" x2="0" y2="1"><stop stop-color="#95683e"/><stop offset="1" stop-color="#442d22"/></linearGradient>
+    <linearGradient id="space" x2="0" y2="1"><stop stop-color="#263e55"/><stop offset="1" stop-color="#101b2b"/></linearGradient>
+    <linearGradient id="mansion" x2="0" y2="1"><stop stop-color="#384047"/><stop offset="1" stop-color="#141a21"/></linearGradient>
+    <radialGradient id="lamp"><stop stop-color="#ffe1a0" stop-opacity=".9"/><stop offset="1" stop-color="#e18c42" stop-opacity="0"/></radialGradient>
+  </defs>
+
+  <symbol id="dungeon-corridor" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="url(#stone)"/><path d="M0 0h640v108H0z" fill="#45534a"/><path d="M0 0l205 76v190L0 400zm640 0L435 76v190l205 134z" fill="#293832"/>
+    <path d="M205 76h230v190H205z" fill="#101916"/><path d="M205 76Q320-28 435 76" fill="none" stroke="#697266" stroke-width="13"/>
+    <path d="M0 400l205-134h230l205 134z" fill="#625440"/><path d="M205 266h230M160 296h320M102 333h436" stroke="#89795f" stroke-width="4" opacity=".55"/>
+    <path d="M62 142h24v75H62zm492 0h24v75h-24z" fill="#81745e"/><path d="M52 138q22-38 44 0l-9 31H61zm492 0q22-38 44 0l-9 31h-26z" fill="url(#torch)"/>
+    <path d="M0 50h125M515 50h125M0 94h166M474 94h166" stroke="#6d7467" stroke-width="5" opacity=".65"/>
+  </symbol>
+  <symbol id="dungeon-trap" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#27352f"/><path d="M0 0h640v238H0z" fill="#3e4b40"/><path d="M70 0v238m100-238v238m300-238v238m100-238v238M0 70h640M0 150h640" stroke="#657062" stroke-width="5" opacity=".7"/>
+    <path d="M0 238h640v162H0z" fill="#574b3d"/><path d="M0 290h640M0 346h640M106 238v162m106-162v162m106-162v162m106-162v162m106-162v162" stroke="#85745d" stroke-width="4"/>
+    <path d="M116 258l28 66h-56zm408 0l28 66h-56zM256 258l28 66h-56zm140 0l28 66h-56z" fill="#b8b6a7" stroke="#e2ddc8" stroke-width="4"/>
+    <rect x="270" y="321" width="100" height="24" rx="5" fill="#ab6b3d"/><path d="M286 321v24m34-24v24m34-24v24" stroke="#e1aa58" stroke-width="4"/>
+  </symbol>
+  <symbol id="dungeon-treasure" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#17231f"/><path d="M0 0h640v275H0z" fill="#344239"/><path d="M0 274l180-56h280l180 56v126H0z" fill="#514838"/>
+    <path d="M177 216h286v130H177z" fill="url(#wood)" stroke="#d1a35a" stroke-width="8"/><path d="M177 216q143-116 286 0" fill="#6a472e" stroke="#d1a35a" stroke-width="8"/>
+    <path d="M206 240v106m82-119v119m82-119v119m64-106v106" stroke="#cf9c51" stroke-width="7"/><rect x="293" y="264" width="54" height="49" rx="8" fill="#f0c968" stroke="#fff0ae" stroke-width="5"/>
+    <path d="M89 298l28-46 29 46zm401 12l31-55 31 55z" fill="#d6b24f"/><circle cx="119" cy="258" r="12" fill="#fff0a5"/><circle cx="522" cy="256" r="12" fill="#fff0a5"/>
+    <path d="M0 95h120m400 0h120M0 130h155m330 0h155" stroke="#667061" stroke-width="6"/>
+  </symbol>
+
+  <symbol id="mystery-study" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#241f1c"/><rect x="48" y="38" width="544" height="250" fill="#4a3b32"/><path d="M0 300h640v100H0z" fill="#231a17"/>
+    <rect x="88" y="74" width="164" height="144" fill="#161c1c" stroke="#96764d" stroke-width="10"/><path d="M170 74v144m-82-72h164" stroke="#94734e" stroke-width="7"/><circle cx="170" cy="150" r="28" fill="#73807b" opacity=".35"/>
+    <path d="M286 237h288l-34 74H310z" fill="#6c4834"/><path d="M320 310v72m220-72v72" stroke="#402a22" stroke-width="14"/><path d="M422 96l44 7-18 50h-31z" fill="#d3a65f"/><path d="M442 150l-110 130h216z" fill="url(#lamp)"/>
+    <rect x="360" y="247" width="94" height="9" fill="#d8c9a4"/><path d="M366 237h72v11h-72z" fill="#8f2f28"/><circle cx="510" cy="260" r="13" fill="#bd985b"/>
+  </symbol>
+  <symbol id="mystery-evidence" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#29241f"/><rect x="56" y="38" width="528" height="252" rx="5" fill="#756449" stroke="#b79b69" stroke-width="8"/>
+    <path d="M105 90h120v118H105zm197-20h130v115H302zm33 133h137v75H335z" fill="#d8ccb0" stroke="#4e483e" stroke-width="6"/>
+    <circle cx="165" cy="139" r="29" fill="#7a6a55"/><path d="M125 190q39-70 80 0" fill="#41413b"/><path d="M335 99h80m-80 23h57m-57 23h70m-94 77h100m-100 17h75" stroke="#736858" stroke-width="6"/>
+    <path d="M212 119l101 20m-44 72 66-29m74-17 63 42m-137 37 74-30" stroke="#a04434" stroke-width="5"/>
+    <path d="M0 324h640v76H0z" fill="#4e3529"/><path d="M105 322h430" stroke="#a17a4b" stroke-width="9"/><path d="M156 331l74 38m110-39-30 43m119-40 62 39" stroke="#d3b36c" stroke-width="8"/>
+  </symbol>
+  <symbol id="mystery-door" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#181a19"/><path d="M0 0h640v400H0z" fill="#292927"/><path d="M0 0l188 62v240L0 400zm640 0L452 62v240l188 98z" fill="#363431"/>
+    <path d="M188 62h264v240H188z" fill="#151715"/><path d="M231 92h178v310H231z" fill="#5c4331" stroke="#aa8755" stroke-width="12"/><path d="M252 117h136v250H252z" fill="#392d25" stroke="#856742" stroke-width="6"/><circle cx="366" cy="244" r="10" fill="#dfbb70"/>
+    <path d="M0 400l188-98h264l188 98z" fill="#4a4338"/><path d="M63 156h29v76H63zm485 0h29v76h-29z" fill="#dda65c" opacity=".8"/><path d="M48 151q30-53 60 0m485 0q30-53 60 0" fill="url(#lamp)"/>
+  </symbol>
+
+  <symbol id="alien-corridor" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="url(#space)"/><path d="M0 0h640v80H0zM0 320h640v80H0z" fill="#33495a"/><path d="M0 80l180 40v160L0 320zm640 0-180 40v160l180 40z" fill="#1d3041"/>
+    <path d="M180 120h280v160H180z" fill="#101b28" stroke="#597082" stroke-width="8"/><path d="M220 143h200v115H220z" fill="#253b4e"/><path d="M250 162h140v76H250z" fill="#172638" stroke="#73a3a7" stroke-width="5"/>
+    <path d="M34 44h70v12H34zm502 0h70v12h-70zM34 346h70v12H34zm502 0h70v12h-70z" fill="#7cc9c0"/><circle cx="70" cy="50" r="11" fill="#93e6cf"/><circle cx="570" cy="50" r="11" fill="#93e6cf"/>
+    <path d="M0 0l180 120m460-120L460 120M0 400l180-120m460 120L460 280" stroke="#536d7c" stroke-width="6"/>
+  </symbol>
+  <symbol id="alien-control" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#142333"/><path d="M0 0h640v242H0z" fill="#233b4b"/><path d="M0 242h640v158H0z" fill="#182431"/>
+    <path d="M57 63h160v135H57zm365 0h160v135H422z" fill="#0d1c2a" stroke="#617f8c" stroke-width="8"/><path d="M75 84h124v91H75zm365 0h124v91H440z" fill="#1e4651"/>
+    <path d="M250 95h140v105H250z" fill="#213c4d" stroke="#8b5960" stroke-width="7"/><path d="M267 177l26-44 28 30 26-52 25 48" fill="none" stroke="#e07769" stroke-width="8"/>
+    <path d="M77 269h486l-36 73H113z" fill="#354756" stroke="#66808d" stroke-width="6"/><path d="M137 282h70v25h-70zm99 0h70v25h-70zm99 0h70v25h-70zm99 0h70v25h-70z" fill="#81b7ac"/><circle cx="320" cy="326" r="8" fill="#ffc16b"/>
+  </symbol>
+  <symbol id="alien-crew" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#10202b"/><path d="M0 0h640v400H0z" fill="#1d3540"/><path d="M48 46h544v282H48z" fill="#13232e" stroke="#58717a" stroke-width="10"/>
+    <path d="M88 83h190v209H88zM362 83h190v209H362z" fill="#243d46" stroke="#5e8383" stroke-width="6"/><path d="M116 112h134v150H116zm274 0h134v150H390z" fill="#0f202a"/>
+    <path d="M166 236q-23-91 20-112 42 21 19 112z" fill="#98aead" opacity=".62"/><path d="M440 236q-23-91 20-112 42 21 19 112z" fill="#98aead" opacity=".62"/>
+    <path d="M0 340h640v60H0z" fill="#0b171f"/><path d="M144 365h352" stroke="#6eb1a7" stroke-width="8"/><circle cx="114" cy="365" r="9" fill="#81d0b9"/><circle cx="527" cy="365" r="9" fill="#81d0b9"/>
+  </symbol>
+
+  <symbol id="mansion-exterior" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="url(#mansion)"/><circle cx="494" cy="78" r="42" fill="#c9c4a4" opacity=".6"/><path d="M0 250q110-80 225 0t220 0 195 0v150H0z" fill="#10171a"/>
+    <path d="M98 212h444v145H98z" fill="#343638"/><path d="M154 148h329v64H154z" fill="#282c2e"/><path d="M130 148l190-93 190 93z" fill="#24282b" stroke="#6c6960" stroke-width="8"/>
+    <path d="M260 259h118v98H260z" fill="#171c1e" stroke="#625848" stroke-width="7"/><path d="M160 236h56v76h-56zm264 0h56v76h-56z" fill="#d4ad68" opacity=".72"/><path d="M0 218h640" stroke="#a3a69c" stroke-width="12" opacity=".14"/>
+    <path d="M64 358q20-88 39 0m435 0q20-88 39 0" stroke="#202a29" stroke-width="20"/>
+  </symbol>
+  <symbol id="mansion-staircase" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#201f1e"/><path d="M0 0h640v400H0z" fill="#353331"/><path d="M102 0h436v287H102z" fill="#242422"/>
+    <path d="M129 279h93v-44h93v-44h93v-44h93v-44h47v222H129z" fill="#6b5943" stroke="#a28a64" stroke-width="7"/><path d="M222 235v-93h93v-44h93v-44h93" fill="none" stroke="#c0a06d" stroke-width="8"/>
+    <path d="M0 370h640v30H0z" fill="#171716"/><path d="M102 0v283m436-283v190" stroke="#5b574d" stroke-width="10"/><path d="M155 54h68v81h-68z" fill="#aa8753"/><path d="M166 65h46v56h-46z" fill="#83908a" opacity=".45"/>
+    <circle cx="322" cy="40" r="10" fill="#e5c58b"/><path d="M322 40v36m0-18-42 30m42-30 42 30" stroke="#b69b6c" stroke-width="5"/>
+  </symbol>
+  <symbol id="mansion-library" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#27221e"/><path d="M0 0h640v306H0z" fill="#44372d"/><path d="M55 50h530v230H55z" fill="#241f1b" stroke="#96744c" stroke-width="9"/>
+    <path d="M225 50v230m190-230v230M55 162h530" stroke="#92734d" stroke-width="8"/>
+    <path d="M76 72h53v78H76zm69 0h59v78h-59zm98 0h61v78h-61zm72 0h58v78h-58zm76 0h67v78h-67zm-315 111h60v79h-60zm76 0h74v79h-74zm183 0h67v79h-67zm81 0h67v79h-67z" fill="#79543a"/>
+    <path d="M0 306h640v94H0z" fill="#171513"/><path d="M173 289h294l40 64H133z" fill="#624832" stroke="#a28053" stroke-width="7"/><path d="M210 354v46m219-46v46" stroke="#6d5137" stroke-width="13"/><path d="M268 278v-50m104 50v-50" stroke="#d2b274" stroke-width="7"/><circle cx="320" cy="221" r="28" fill="#f3dcaa" opacity=".22"/>
+  </symbol>
+  <symbol id="escapehub-room" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#21382f"/><path d="M0 0h640v276H0z" fill="#47634e"/><path d="M0 276h640v124H0z" fill="#443c30"/><path d="M100 45h440v238H100z" fill="#1d2924" stroke="#9f8b66" stroke-width="10"/><path d="M147 92h346v191H147z" fill="#34453c"/><path d="M0 400l147-117h346L640 400z" fill="#716148"/><circle cx="320" cy="158" r="51" fill="#d5b46d" opacity=".75"/><path d="M291 158h58m-29-29v58" stroke="#29362f" stroke-width="9"/>
+  </symbol>
+  <symbol id="escapehub-puzzle" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#263830"/><path d="M0 0h640v300H0z" fill="#536354"/><path d="M0 300h640v100H0z" fill="#302d27"/><rect x="84" y="59" width="472" height="217" rx="8" fill="#26312b" stroke="#b19a67" stroke-width="9"/><path d="M170 107h92v92h-92zm208 0h92v92h-92z" fill="#c5a866"/><path d="M260 152h120m-60-60v120" stroke="#e7d6a9" stroke-width="9"/><path d="M214 276l106-70 106 70" fill="none" stroke="#c77451" stroke-width="10"/>
+  </symbol>
+  <symbol id="escapehub-adventure" viewBox="0 0 640 400">
+    <rect width="640" height="400" fill="#182b2d"/><path d="M0 0h640v275H0z" fill="#3d625b"/><path d="M0 275h640v125H0z" fill="#252f2b"/><path d="M71 274l123-151 77 92 83-131 216 190z" fill="#192a2a"/><path d="M195 123l38 47-39-13-28 22zm159-39 42 66-49-22-32 25z" fill="#c9ad6c"/><path d="M0 335q128-63 256 0t256 0 128 0v65H0z" fill="#52604a"/><circle cx="492" cy="77" r="32" fill="#e2c888" opacity=".85"/>
+  </symbol>
+</svg>

@@ -1,0 +1,70 @@
+@model RoomPageModel
+@{
+    ViewData["Title"] = Model.Room.Name;
+    var room = Model.Room;
+}
+<p class="eyebrow"><a asp-action="Index">Szabadulószobák</a> / Részletek</p>
+<section class="room-detail-heading">
+    <div>
+        <p class="eyebrow">A következő közös kaland</p>
+        <h1>@room.Name</h1>
+        <p>@room.Description</p>
+    </div>
+    <div class="room-detail-facts">
+        <span><strong>@room.SolveDurationMinutes</strong> perc játékidő</span>
+        <span><strong>@room.Capacity</strong> fős kapacitás</span>
+    </div>
+</section>
+
+<div class="section-heading room-gallery-heading">
+    <div><p class="eyebrow">Pillantás a történetbe</p><h2>A szoba hangulata</h2></div>
+    <span>Hangulatképek a szobából</span>
+</div>
+<div class="room-gallery">
+@foreach (var image in Model.Images) {
+    <figure class="room-gallery-card">
+        @if (image.ImagePath is not null) {
+            <img class="room-gallery-image" src="@image.ImagePath" alt="@image.AltText" loading="lazy" />
+        } else {
+            <svg class="room-gallery-image" viewBox="0 0 640 400" role="img" aria-label="@image.AltText">
+                <use href="/images/rooms/placeholders.svg#@image.SvgId"></use>
+            </svg>
+        }
+        <figcaption>@image.Caption</figcaption>
+    </figure>
+}
+</div>
+
+<section class="room-detail-slots">
+    <div class="section-heading">
+        <div><p class="eyebrow">Válassz időpontot</p><h2>Elérhető időpontok</h2></div>
+        <span>A játékidőhöz 30 perc előkészítés adódik.</span>
+    </div>
+    @if (room.TimeSlots.Count == 0) {
+        <section class="empty-state"><h3>Jelenleg nincs szabad időpont</h3><p>Nézz vissza később, vagy válassz egy másik szobát.</p></section>
+    } else {
+        <div class="room-detail-slot-list">
+        @foreach (var slot in room.TimeSlots.OrderBy(item => item.StartsAtUtc)) {
+            var taken = slot.HasActiveBooking;
+            <div class="slot-row">
+                <span>@HungarianTime.FromUtc(slot.StartsAtUtc).ToString("yyyy. MMMM d. (dddd) · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU")) – @HungarianTime.FromUtc(slot.EndsAtUtc).ToString("HH:mm")</span>
+                @if (taken) {
+                    <span class="pill">Foglalt</span>
+                } else if (User.Identity?.IsAuthenticated == true) {
+                    <form asp-action="Book" method="post">
+                        <input type="hidden" name="slotId" value="@slot.Id" />
+                        <label>Résztvevők
+                            <select name="participantCount">
+                                @for (var count = 2; count <= room.Capacity; count++) { <option value="@count">@count fő</option> }
+                            </select>
+                        </label>
+                        <button class="button small">Foglalás</button>
+                    </form>
+                } else {
+                    <a class="button small" asp-controller="Account" asp-action="Login">Belépés a foglaláshoz</a>
+                }
+            </div>
+        }
+        </div>
+    }
+</section>

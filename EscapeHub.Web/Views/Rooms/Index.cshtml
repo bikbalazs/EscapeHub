@@ -5,10 +5,6 @@
 @if (Model.Count == 0) { <section class="empty-state"><h3>Hamarosan érkeznek az első szobák</h3><p>Az adminisztrátor még nem adott hozzá foglalható szobát.</p></section> }
 <div class="room-grid">
 @foreach (var room in Model) {
-    <article class="room-card"><div class="room-art"><span>ESCAPEHUB</span><b>@room.Id.ToString("00")</b></div><div class="room-content"><div class="room-meta"><span>⏱ @room.SolveDurationMinutes perc</span><span>♙ @room.Capacity fő</span></div><h3>@room.Name</h3><p>@room.Description</p>
-    <div class="slots"><h4>Választható időpontok</h4>
-    @if (room.TimeSlots.Count == 0) { <p class="muted">Jelenleg nincs meghirdetett időpont.</p> }
-    else { @foreach (var slot in room.TimeSlots.OrderBy(x => x.StartsAtUtc)) { var taken = slot.HasActiveBooking; <div class="slot-row"><span>@HungarianTime.FromUtc(slot.StartsAtUtc).ToString("yyyy. MMMM d. (dddd) · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU"))</span>@if (taken) { <span class="pill">Foglalt</span> } else if (User.Identity?.IsAuthenticated == true) { <form asp-action="Book" method="post"><input type="hidden" name="slotId" value="@slot.Id"/><label>Résztvevők <select name="participantCount">@for (var count = 2; count <= room.Capacity; count++) { <option value="@count">@count fő</option> }</select></label><button class="button small">Foglalás</button></form> } else { <a class="button small" asp-controller="Account" asp-action="Login">Belépés a foglaláshoz</a> }</div> } }
-    </div></div></article>
+    <article class="room-card"><div class="room-art"><span>ESCAPEHUB</span><b>@room.Id.ToString("00")</b></div><div class="room-content"><div class="room-meta"><span>⏱ @room.SolveDurationMinutes perc</span><span>♙ @room.Capacity fő</span></div><h3>@room.Name</h3><p>@room.Description</p><a class="button small" asp-action="Details" asp-route-id="@room.Id">Szoba részletei és időpontok</a></div></article>
 }
 </div>
