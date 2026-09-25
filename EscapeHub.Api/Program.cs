@@ -1,4 +1,5 @@
 using EscapeHub.Core.Entities;
+using EscapeHub.Api;
 using EscapeHub.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
@@ -58,6 +59,8 @@ using (var scope = app.Services.CreateScope())
     await db.Database.EnsureCreatedAsync();
     await EnsureRoomDurationColumnAsync(db);
     await EnsureBookingParticipantCountColumnAsync(db);
+    if (app.Environment.IsDevelopment())
+        await DemoRoomSeeder.SeedAsync(db);
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
     async Task EnsureConfiguredUserAsync(string? configuredEmail, string? password, bool isAdmin)
     {

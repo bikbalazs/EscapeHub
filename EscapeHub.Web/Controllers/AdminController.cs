@@ -123,13 +123,30 @@ public sealed class AdminController(EscapeHubApiClient api) : Controller
             Email = model.Email.Trim(), Password = model.Password, IsAdmin = model.IsAdmin
         });
         if (!result.Succeeded) { result.AddErrorsTo(ModelState); return View("User", model); }
-        TempData["Message"] = "A felhasználó létrejött.";
+        TempData["Message"] = model.IsAdmin
+            ? "A felhasználó adminisztrátori jogosultsággal létrejött. Az új fiókkal adminisztrátorként lehet bejelentkezni."
+            : "A felhasználó létrejött.";
         return RedirectToAction(nameof(Index));
     }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> SetAdmin(Guid id, bool isAdmin) =>
-        AdminAction(await api.PostAsync<object>($"api/admin/users/{id}/role", new SetAdminRequest { IsAdmin = isAdmin }));
+    public Task<IActionResult> PromoteUser(Guid id) => ChangeUserRole(id, true);
+
+    [HttpPost, ValidateAntiForgeryToken]
+    public Task<IActionResult> RevokeAdmin(Guid id) => ChangeUserRole(id, false);
+
+    private async Task<IActionResult> ChangeUserRole(Guid id, bool isAdmin)
+    {
+        var result = await api.PostAsync<object>(
+            $"api/admin/users/{id}/role",
+            new SetAdminRequest { IsAdmin = isAdmin });
+        TempData["Message"] = result.Succeeded
+            ? isAdmin
+                ? "A felhasználó adminisztrátori jogosultságot kapott. A változás a következő bejelentkezéskor lép életbe."
+                : "A felhasználó adminisztrátori jogosultságát visszavontuk. A változás a következő bejelentkezéskor lép életbe."
+            : result.Message ?? $"Nem sikerült módosítani a jogosultságot ({(int)result.StatusCode}).";
+        return RedirectToAction(nameof(Index));
+    }
 
     private async Task<TimeSlotFormModel?> LoadSlot(int roomId, int id)
     {

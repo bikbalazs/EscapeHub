@@ -8,6 +8,8 @@
 <section class="admin-card">
     <div class="admin-card-head"><div><h3>@room.Name @if (!room.IsActive) { <span class="pill">Inaktív</span> }</h3><p>@room.Capacity fő · @room.SolveDurationMinutes perc játékidő + 30 perc előkészítés · @room.Description</p></div><a class="button small secondary" asp-action="Room" asp-route-id="@room.Id">Szerkesztés</a></div>
     @if (room.IsActive) {
+        <details class="admin-slots-disclosure">
+        <summary>Időpontok megjelenítése <span class="pill">@room.TimeSlots.Count</span></summary>
         <div class="admin-slots"><a asp-action="Slot" asp-route-roomId="@room.Id" class="text-link">+ Időpont hozzáadása</a>
         @foreach (var slot in room.TimeSlots.OrderBy(x => x.StartsAtUtc)) {
             var activeBooking = slot.HasActiveBooking;
@@ -17,6 +19,7 @@
             </div></div>
         }
         </div>
+        </details>
         <form asp-action="DeactivateRoom" method="post" class="inline-form"><input type="hidden" name="id" value="@room.Id"/><button class="link-button danger">Szoba inaktiválása</button></form>
     } else {
         <form asp-action="ActivateRoom" method="post" class="inline-form"><input type="hidden" name="id" value="@room.Id"/><button class="link-button">Szoba újraaktiválása</button></form>
@@ -25,6 +28,12 @@
 }
 <h2>Felhasználók</h2><div class="admin-card">
 @foreach (var user in Model.Users) {
-    <div class="slot-row"><span>@user.Email <span class="pill">@(user.IsAdmin ? "Adminisztrátor" : "Felhasználó")</span></span><form asp-action="SetAdmin" method="post"><input type="hidden" name="id" value="@user.Id"/><input type="hidden" name="isAdmin" value="@(!user.IsAdmin)"/><button class="link-button">@(user.IsAdmin ? "Jogosultság visszavonása" : "Adminná tétel")</button></form></div>
+    <div class="slot-row"><span>@user.Email <span class="pill">@(user.IsAdmin ? "Adminisztrátor" : "Felhasználó")</span></span>
+    @if (user.IsAdmin) {
+        <form asp-action="RevokeAdmin" method="post"><input type="hidden" name="id" value="@user.Id"/><button class="link-button">Jogosultság visszavonása</button></form>
+    } else {
+        <form asp-action="PromoteUser" method="post"><input type="hidden" name="id" value="@user.Id"/><button class="link-button">Adminná tétel</button></form>
+    }
+    </div>
 }
 </div>

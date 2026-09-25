@@ -27,6 +27,8 @@ Az alkalmazás első indításkor létrehozza az `escapehub.db` adatbázisfájlt
 
 Ezek a nyilvános forráskódban szereplő, kizárólag helyi bemutatásra szánt fejlesztői fiókok. Ne telepítse az alkalmazást éles környezetben fejlesztői móddal, és ne használja ezeket a jelszavakat valódi adatokhoz. A fiókok csak akkor jönnek létre, ha az adott e-mail-cím még nem szerepel az adatbázisban.
 
+Fejlesztői módban az első indításkor a rendszer létrehozza a négy magyar mintaszobát és a mai nap, valamint a következő két nap időpontjait. Az időpontok a budapesti helyi dátumhoz igazodnak: naponta 16:00-kor kezdődnek, és legkésőbb 22:00-kor érnek véget. A játékidőhöz 30 perc előkészítési idő adódik; a mintaszobák férőhelye 6 fő. Ha az alkalmazás 16:00 után indul el, az aznapi korábbi kezdések kimaradnak. A már létező szobákat és időpontokat az indítás nem írja felül.
+
 Egyéni rendszergazdai fiók beállításához használjon környezeti változókat vagy .NET User Secrets szolgáltatást:
 
 ```powershell
@@ -59,3 +61,7 @@ A felhasználók az oldalon is regisztrálhatnak. A rendszergazdai felület csak
 Az EscapeHub API kezeli az adatbázist, a fiókokat, a szobákat, az időpontokat és a foglalásokat. A Web alkalmazás szerveroldali HTTP-kérésekkel kommunikál az API-val; a két alkalmazás közös bejelentkezési kulcsokat használ.
 
 Az SQLite-adatbázis helyi fejlesztéshez és prototípushoz készült. Törlés előtt készítsen róla biztonsági másolatot; a jelenlegi beállítás `EnsureCreated`-et használ adatbázis-migrációk helyett.
+
+## Adatbázis-export
+
+A [docs/adatbazis-export.sql](docs/adatbazis-export.sql) fájl az SQLite-adatbázis aktuális sémáját és korlátozásait tartalmazza, személyes vagy felhasználó által létrehozott rekordok nélkül. Fejlesztői módban a bemutató-fiókokat az API indításkor hozza létre.

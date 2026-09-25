@@ -8,9 +8,9 @@
 
 | Tesztprojekt | Sikeres | Sikertelen | Kihagyott |
 |---|---:|---:|---:|
-| `EscapeHub.Api.Tests` | 42 | 0 | 0 |
+| `EscapeHub.Api.Tests` | 44 | 0 | 0 |
 | `EscapeHub.Infrastructure.Tests` | 2 | 0 | 0 |
-| **Összesen** | **44** | **0** | **0** |
+| **Összesen** | **46** | **0** | **0** |
 
 ## Ellenőrzött működések
 
@@ -25,6 +25,7 @@
 - Foglalás létrehozása, illetve visszautasítása nem létező, inaktív, lejárt vagy már aktívan foglalt időpontra.
 - A foglalásban megadott résztvevőszám tárolása; a 2 fős minimum engedélyezése, valamint az ennél kisebb és a szoba férőhelyét meghaladó létszám visszautasítása.
 - A szobák 2–50 fős kapacitástartományának ellenőrzése.
+- A négy magyar mintaszoba létrehozása, időtartama és férőhelye; a mai nap és a következő két nap budapesti helyi idő szerinti időpontjai 16:00 és 22:00 között; az ismételt indítás nem sokszorozza vagy írja felül a szobákat és az időpontokat.
 - Foglalás lemondása csak a foglalás tulajdonosának, saját és már lemondott foglalás kezelése.
 - A saját foglalások listája nem tartalmazza más felhasználók foglalásait.
 - A nyilvános szobalista elrejti az inaktív szobákat és időpontokat, valamint jelzi az aktív foglalásokat.
