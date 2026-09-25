@@ -14,7 +14,7 @@
     </nav>
     <div class="account">
     @if (User.Identity?.IsAuthenticated == true) { <span>@User.Identity.Name</span><form asp-controller="Account" asp-action="Logout" method="post"><button class="link-button">Kilépés</button></form> }
-    else { <a asp-controller="Account" asp-action="Login">Belépés</a><a class="button small" asp-controller="Account" asp-action="Register">Regisztráció</a> }
+    else { <a asp-controller="Account" asp-action="Login">Belépés</a><a class="button small register-button" asp-controller="Account" asp-action="Register">Regisztráció</a> }
     </div>
 </header>
 <main class="container">

@@ -18,6 +18,22 @@ dotnet run --project EscapeHub.Api --launch-profile https
 dotnet run --project EscapeHub.Web --launch-profile https
 ```
 
+## Műszaki feltételek
+
+- A .NET 8 SDK szükséges. Visual Studio használatakor az ASP.NET- és webfejlesztési workload legyen telepítve; parancssori futtatásnál a .NET SDK önmagában elegendő.
+- Modern, HTML5- és CSS-támogatású böngésző szükséges.
+- Az alkalmazás SQLite-adatbázist használ, ezért külön adatbázis-kiszolgáló vagy virtuális gép nem szükséges.
+- Helyi használatkor az API és a Web alkalmazást egyszerre kell futtatni. Az adatbázisfájlt az API hozza létre.
+- A rendszer a dátumokat és időpontokat budapesti helyi idő szerint jeleníti meg.
+
+## Rövid használati útmutató
+
+1. A látogató a szobalistából kiválaszt egy szobát, majd a részleteknél megadja az időpontot és a résztvevők számát. Foglaláshoz be kell jelentkeznie; új fiók a regisztrációs oldalon hozható létre.
+2. A bejelentkezett felhasználó a **Foglalásaim** oldalon megtekintheti és lemondhatja a foglalásait.
+3. A rendszergazda az **Adminisztráció** oldalon szobákat és felhasználókat kezelhet, időpontokat adhat hozzá, valamint áttekintheti és lemondhatja a foglalásokat. Új időpontnál a kezdést kell megadni; a befejezés a játékidő és a 30 perces előkészítési idő alapján automatikusan számítódik.
+
+Fejlesztői módban a bemutató-fiókokkal is kipróbálhatók a felhasználói és rendszergazdai műveletek.
+
 Az alkalmazás első indításkor létrehozza az `escapehub.db` adatbázisfájlt a tároló gyökérkönyvtárában. Fejlesztői módban két bemutató-fiók érhető el:
 
 | Szerepkör | E-mail-cím | Jelszó |
@@ -36,7 +52,7 @@ $env:EscapeHub__AdminEmail = "admin@example.com"
 $env:EscapeHub__AdminPassword = "egy-hosszu-egyedi-jelszo"
 ```
 
-Az API-t az egyik terminálban, a weboldalt pedig a környezeti változókat beállító másik terminálban indítsa el:
+Az adminisztrátori fiók környezeti változóit abban a PowerShell-ablakban állítsa be, amelyben az API-t elindítja. Egy másik ablakban indítsa el a Web alkalmazást:
 
 ```powershell
 dotnet run --project EscapeHub.Api --launch-profile https
@@ -48,7 +64,7 @@ dotnet run --project EscapeHub.Web --launch-profile https
 
 A felhasználók az oldalon is regisztrálhatnak. A rendszergazdai felület csak rendszergazdai jogosultságú fiókkal érhető el.
 
-## Az weboldal funkciói
+## A weboldal funkciói
 
 - Regisztráció, bejelentkezés és kijelentkezés.
 - Aktív szobák és jövőbeli időpontok böngészése.
@@ -64,4 +80,4 @@ Az SQLite-adatbázis helyi fejlesztéshez és prototípushoz készült. Törlés
 
 ## Adatbázis-export
 
-A [docs/adatbazis-export.sql](docs/adatbazis-export.sql) fájl az SQLite-adatbázis aktuális sémáját és korlátozásait tartalmazza, személyes vagy felhasználó által létrehozott rekordok nélkül. Fejlesztői módban a bemutató-fiókokat az API indításkor hozza létre.
+A [docs/adatbazis-export.sql](docs/adatbazis-export.sql) az adatbázissémát, a két bemutató-fiókot, a négy mintaszobát és a dinamikusan létrehozott időpontokat tartalmazza. Személyes felhasználói fiókot és foglalást nem tartalmaz. A fájl futtatásakor az időpontok a mai napra és a következő két napra jönnek létre; a dátumokat a gép helyi idejéből számítja, ezért az SQL-fájl importálásakor a rendszer időzónája legyen Budapest. Üres adatbázison futtassa. Az API fejlesztői indításkor adatbázis-export nélkül is létrehozza a bemutató-fiókokat, szobákat és időpontokat.
