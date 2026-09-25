@@ -8,9 +8,9 @@
 
 | Tesztprojekt | Sikeres | Sikertelen | Kihagyott |
 |---|---:|---:|---:|
-| `EscapeHub.Api.Tests` | 33 | 0 | 0 |
+| `EscapeHub.Api.Tests` | 42 | 0 | 0 |
 | `EscapeHub.Infrastructure.Tests` | 2 | 0 | 0 |
-| **Összesen** | **35** | **0** | **0** |
+| **Összesen** | **44** | **0** | **0** |
 
 ## Ellenőrzött működések
 
@@ -23,6 +23,8 @@
 - Regisztrációkor az e-mail-cím normalizálása, a jelszó hashelése és a már létező e-mail-cím visszautasítása.
 - Bejelentkezés helyes jelszóval, valamint elutasítás hibás jelszó vagy nem létező fiók esetén; kijelentkezési művelet meghívása.
 - Foglalás létrehozása, illetve visszautasítása nem létező, inaktív, lejárt vagy már aktívan foglalt időpontra.
+- A foglalásban megadott résztvevőszám tárolása; a 2 fős minimum engedélyezése, valamint az ennél kisebb és a szoba férőhelyét meghaladó létszám visszautasítása.
+- A szobák 2–50 fős kapacitástartományának ellenőrzése.
 - Foglalás lemondása csak a foglalás tulajdonosának, saját és már lemondott foglalás kezelése.
 - A saját foglalások listája nem tartalmazza más felhasználók foglalásait.
 - A nyilvános szobalista elrejti az inaktív szobákat és időpontokat, valamint jelzi az aktív foglalásokat.
@@ -32,4 +34,4 @@
 
 A tesztek közvetlenül hívják az API-vezérlő műveleteit SQLite memóriabeli adatbázissal, illetve ellenőrzik az adatbázis-korlátozásokat. A regisztrációs és bejelentkezési próbák rögzítik, hogy a vezérlő milyen felhasználót adna át bejelentkezésre; nem tesztelik a valódi cookie-middleware-t. Nem automatizált böngészős végponttól végpontig tesztek, és az API hitelesítési/antiforgery szűrőit sem futtatják. Ezek és a felületek kézi ellenőrzése külön feladat.
 
-A tesztfuttatás sikeres volt. A NuGet a `System.Net.Http` 4.3.0 (`GHSA-7jgj-8wvc-jh57`) és a `System.Text.RegularExpressions` 4.3.0 (`GHSA-cmhx-cq75-c4mj`) csomagokhoz ismert, magas súlyosságú sebezhetőségekre figyelmeztetett. Ezek a figyelmeztetések nem akadályozták a tesztek futását, de a csomagfüggőségeket később frissíteni kell.
+A tesztfuttatás sikeres volt. A csomag-visszaállítás során a NuGet sebezhetőségi adatainak lekérése nem sikerült (`NU1900`), mert a `https://api.nuget.org/v3/index.json` végpont nem volt elérhető. Emiatt ez a futtatás nem tudta frissíteni a csomagok biztonsági ellenőrzését. Egy korábbi sikeres ellenőrzés magas súlyosságú figyelmeztetést jelzett a `System.Net.Http` 4.3.0 (`GHSA-7jgj-8wvc-jh57`) és a `System.Text.RegularExpressions` 4.3.0 (`GHSA-cmhx-cq75-c4mj`) csomagra; ezeket a függőségeket érdemes frissíteni.

@@ -46,6 +46,7 @@ public sealed class AdminBookingsController(EscapeHubDbContext db) : ControllerB
         booking.TimeSlotId,
         booking.TimeSlot!.Room!.Name,
         booking.User!.Email,
+        booking.ParticipantCount,
         DateTime.SpecifyKind(booking.TimeSlot.StartsAtUtc, DateTimeKind.Utc),
         DateTime.SpecifyKind(booking.TimeSlot.EndsAtUtc, DateTimeKind.Utc),
         booking.CancelledAtUtc is DateTime cancelledAt

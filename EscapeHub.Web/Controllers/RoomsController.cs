@@ -19,9 +19,13 @@ public sealed class RoomsController(EscapeHubApiClient api) : Controller
     }
 
     [Authorize, HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Book(int slotId)
+    public async Task<IActionResult> Book(int slotId, int participantCount = 2)
     {
-        var result = await api.PostAsync<object>("api/bookings", new BookingCreateRequest { TimeSlotId = slotId });
+        var result = await api.PostAsync<object>("api/bookings", new BookingCreateRequest
+        {
+            TimeSlotId = slotId,
+            ParticipantCount = participantCount
+        });
         TempData["Message"] = result.Succeeded
             ? "A foglalás sikeresen létrejött."
             : result.Message ?? "Ez az időpont már nem foglalható.";

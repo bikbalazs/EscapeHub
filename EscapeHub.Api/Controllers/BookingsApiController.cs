@@ -29,18 +29,24 @@ public sealed class BookingsApiController(EscapeHubDbContext db) : ControllerBas
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(BookingCreateRequest request)
     {
-        var slot = await db.TimeSlots.Include(item => item.Bookings)
+        var slot = await db.TimeSlots.Include(item => item.Room).Include(item => item.Bookings)
             .SingleOrDefaultAsync(item => item.Id == request.TimeSlotId);
         if (slot is null || !slot.IsActive || slot.EndsAtUtc <= DateTime.UtcNow ||
             slot.Bookings.Any(booking => booking.CancelledAtUtc is null))
         {
             return Conflict(new { message = "Ez az időpont már nem foglalható." });
         }
+        var roomCapacity = slot.Room?.Capacity ?? 0;
+        if (request.ParticipantCount < 2 || request.ParticipantCount > roomCapacity)
+        {
+            return BadRequest(new { message = $"A résztvevők száma 2 és {roomCapacity} fő között lehet." });
+        }
 
         var booking = new Booking
         {
             TimeSlotId = slot.Id,
             UserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!),
+            ParticipantCount = request.ParticipantCount,
             CreatedAtUtc = DateTime.UtcNow
         };
         db.Bookings.Add(booking);

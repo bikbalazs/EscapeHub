@@ -214,6 +214,30 @@ public sealed class AdminSlotValidationTests : IAsyncLifetime
         Assert.Equal(expectedValid, isValid);
     }
 
+    [Theory]
+    [InlineData(1, false)]
+    [InlineData(2, true)]
+    [InlineData(50, true)]
+    [InlineData(51, false)]
+    public void RoomSaveRequest_RequiresRoomCapacityOfAtLeastTwo(int capacity, bool expectedValid)
+    {
+        var request = new RoomSaveRequest
+        {
+            Name = "Próbaszoba",
+            Capacity = capacity,
+            SolveDurationMinutes = 60
+        };
+        var validationResults = new List<ValidationResult>();
+
+        var isValid = Validator.TryValidateObject(
+            request,
+            new ValidationContext(request),
+            validationResults,
+            validateAllProperties: true);
+
+        Assert.Equal(expectedValid, isValid);
+    }
+
     private async Task<TimeSlot> AddSlot(DateTime startsAt)
     {
         var slot = new TimeSlot

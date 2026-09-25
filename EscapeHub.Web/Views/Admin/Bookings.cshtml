@@ -18,6 +18,7 @@ else
                 <p class="eyebrow">@booking.RoomName</p>
                 <h3>@HungarianTime.FromUtc(booking.StartsAtUtc).ToString("yyyy. MMMM d. (dddd) · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU")) – @HungarianTime.FromUtc(booking.EndsAtUtc).ToString("HH:mm")</h3>
                 <p>Foglaló: @booking.CustomerEmail</p>
+                <p>Résztvevők: @booking.ParticipantCount fő</p>
                 <span class="@(active ? "status-active" : "status-cancelled")">@(active ? "Aktív" : "Lemondva")</span>
                 @if (!active) { <p class="muted">Lemondás ideje: @HungarianTime.FromUtc(booking.CancelledAtUtc!.Value).ToString("yyyy. MMMM d. · HH:mm", System.Globalization.CultureInfo.GetCultureInfo("hu-HU"))</p> }
             </div>

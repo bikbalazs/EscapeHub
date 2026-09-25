@@ -39,7 +39,7 @@ public sealed class RoomFormModel
     [StringLength(2000, ErrorMessage = "A leírás legfeljebb 2000 karakter lehet.")]
     [Display(Name = "Leírás")]
     public string Description { get; set; } = "";
-    [Range(1, 50, ErrorMessage = "A férőhely 1 és 50 közötti legyen.")]
+    [Range(2, 50, ErrorMessage = "A férőhely 2 és 50 közötti legyen.")]
     [Display(Name = "Férőhely")]
     public int Capacity { get; set; } = 4;
     [AllowedSolveDuration(ErrorMessage = "Válasszon 60, 90 vagy 120 perces játékidőt.")]

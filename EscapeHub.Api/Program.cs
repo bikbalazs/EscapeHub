@@ -57,6 +57,7 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<EscapeHubDbContext>();
     await db.Database.EnsureCreatedAsync();
     await EnsureRoomDurationColumnAsync(db);
+    await EnsureBookingParticipantCountColumnAsync(db);
     var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
     async Task EnsureConfiguredUserAsync(string? configuredEmail, string? password, bool isAdmin)
     {
@@ -99,6 +100,40 @@ static async Task EnsureRoomDurationColumnAsync(EscapeHubDbContext db)
         {
             await db.Database.ExecuteSqlRawAsync(
                 "ALTER TABLE \"Rooms\" ADD COLUMN \"SolveDurationMinutes\" INTEGER NOT NULL DEFAULT 60;");
+        }
+    }
+    finally
+    {
+        if (closeConnectionWhenDone) await connection.CloseAsync();
+    }
+}
+
+static async Task EnsureBookingParticipantCountColumnAsync(EscapeHubDbContext db)
+{
+    var connection = db.Database.GetDbConnection();
+    var closeConnectionWhenDone = connection.State != ConnectionState.Open;
+    if (closeConnectionWhenDone) await connection.OpenAsync();
+    try
+    {
+        var hasColumn = false;
+        await using (var command = connection.CreateCommand())
+        {
+            command.CommandText = "PRAGMA table_info('Bookings');";
+            await using var reader = await command.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                if (string.Equals(reader.GetString(1), "ParticipantCount", StringComparison.OrdinalIgnoreCase))
+                {
+                    hasColumn = true;
+                    break;
+                }
+            }
+        }
+
+        if (!hasColumn)
+        {
+            await db.Database.ExecuteSqlRawAsync(
+                "ALTER TABLE \"Bookings\" ADD COLUMN \"ParticipantCount\" INTEGER NOT NULL DEFAULT 1;");
         }
     }
     finally

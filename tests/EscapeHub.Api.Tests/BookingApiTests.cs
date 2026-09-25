@@ -45,13 +45,47 @@ public sealed class BookingApiTests : IAsyncLifetime
     {
         var slot = await AddSlot(DateTime.UtcNow.AddDays(1));
 
-        var result = await _controller.Create(new BookingCreateRequest { TimeSlotId = slot.Id });
+        var result = await _controller.Create(new BookingCreateRequest { TimeSlotId = slot.Id, ParticipantCount = _room.Capacity });
 
         Assert.IsType<NoContentResult>(result);
         var booking = await _db.Bookings.SingleAsync();
         Assert.Equal(_owner.Id, booking.UserId);
         Assert.Equal(slot.Id, booking.TimeSlotId);
+        Assert.Equal(_room.Capacity, booking.ParticipantCount);
         Assert.Null(booking.CancelledAtUtc);
+    }
+
+    [Fact]
+    public async Task Create_AllowsTheMinimumParticipantCount()
+    {
+        var slot = await AddSlot(DateTime.UtcNow.AddDays(1));
+
+        var result = await _controller.Create(new BookingCreateRequest
+        {
+            TimeSlotId = slot.Id
+        });
+
+        Assert.IsType<NoContentResult>(result);
+        Assert.Equal(2, (await _db.Bookings.SingleAsync()).ParticipantCount);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    [InlineData(-1)]
+    [InlineData(5)]
+    public async Task Create_RejectsParticipantCountOutsideRoomCapacity(int participantCount)
+    {
+        var slot = await AddSlot(DateTime.UtcNow.AddDays(1));
+
+        var result = await _controller.Create(new BookingCreateRequest
+        {
+            TimeSlotId = slot.Id,
+            ParticipantCount = participantCount
+        });
+
+        Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Empty(await _db.Bookings.ToListAsync());
     }
 
     [Fact]
@@ -167,6 +201,7 @@ public sealed class BookingApiTests : IAsyncLifetime
         var booking = Assert.Single(bookings);
         Assert.Equal(_owner.Email, booking.CustomerEmail);
         Assert.Equal("Próbaszoba", booking.RoomName);
+        Assert.Equal(1, booking.ParticipantCount);
     }
 
     private BookingsApiController CreateController(Guid userId)

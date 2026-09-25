@@ -25,6 +25,7 @@ public sealed record BookingDto(
     int TimeSlotId,
     string RoomName,
     string CustomerEmail,
+    int ParticipantCount,
     DateTime StartsAtUtc,
     DateTime EndsAtUtc,
     DateTime? CancelledAtUtc);
@@ -65,7 +66,7 @@ public sealed class RoomSaveRequest
     [StringLength(2000, ErrorMessage = "A leírás legfeljebb 2000 karakter lehet.")]
     public string Description { get; set; } = "";
 
-    [Range(1, 50, ErrorMessage = "A férőhely 1 és 50 közötti legyen.")]
+    [Range(2, 50, ErrorMessage = "A férőhely 2 és 50 közötti legyen.")]
     public int Capacity { get; set; }
 
     [AllowedSolveDuration(ErrorMessage = "Válasszon 60, 90 vagy 120 perces játékidőt.")]
@@ -84,6 +85,9 @@ public sealed class BookingCreateRequest
 {
     [Range(1, int.MaxValue, ErrorMessage = "Válasszon időpontot.")]
     public int TimeSlotId { get; set; }
+
+    [Range(2, 50, ErrorMessage = "A résztvevők száma legalább 2 legyen.")]
+    public int ParticipantCount { get; set; } = 2;
 }
 
 public sealed class AdminUserCreateRequest
