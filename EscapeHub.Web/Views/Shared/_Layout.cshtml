@@ -8,13 +8,18 @@
 </head>
 <body>
 <header class="site-header"><a class="brand" asp-controller="Rooms" asp-action="Index">EscapeHub</a>
-    <nav><a asp-controller="Rooms" asp-action="Index">Szobák</a>
-    @if (User.Identity?.IsAuthenticated == true) { <a asp-controller="Rooms" asp-action="MyBookings">Foglalásaim</a> }
-    @if (User.IsInRole("Admin")) { <a asp-controller="Admin" asp-action="Index">Adminisztráció</a> }
-    </nav>
-    <div class="account">
-    @if (User.Identity?.IsAuthenticated == true) { <span>@User.Identity.Name</span><form asp-controller="Account" asp-action="Logout" method="post"><button class="link-button">Kilépés</button></form> }
-    else { <a asp-controller="Account" asp-action="Login">Belépés</a><a class="button small register-button" asp-controller="Account" asp-action="Register">Regisztráció</a> }
+    <button class="menu-toggle" type="button" aria-controls="header-menu" aria-expanded="false" aria-label="Menü megnyitása">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="header-menu" id="header-menu">
+        <nav aria-label="Fő navigáció"><a asp-controller="Rooms" asp-action="Index">Szobák</a>
+        @if (User.Identity?.IsAuthenticated == true) { <a asp-controller="Rooms" asp-action="MyBookings">Foglalásaim</a> }
+        @if (User.IsInRole("Admin")) { <a asp-controller="Admin" asp-action="Index">Adminisztráció</a> }
+        </nav>
+        <div class="account">
+        @if (User.Identity?.IsAuthenticated == true) { <span>@User.Identity.Name</span><form asp-controller="Account" asp-action="Logout" method="post"><button class="link-button">Kilépés</button></form> }
+        else { <a asp-controller="Account" asp-action="Login">Belépés</a><a class="button small register-button" asp-controller="Account" asp-action="Register">Regisztráció</a> }
+        </div>
     </div>
 </header>
 <main class="container">
@@ -22,5 +27,23 @@
     @RenderBody()
 </main>
 <footer>EscapeHub <span>•</span> Szabadulószoba-foglalás</footer>
+<script>
+    const menuToggle = document.querySelector('.menu-toggle');
+    const headerMenu = document.querySelector('#header-menu');
+    menuToggle.addEventListener('click', () => {
+        const isOpening = menuToggle.getAttribute('aria-expanded') !== 'true';
+        menuToggle.setAttribute('aria-expanded', isOpening);
+        menuToggle.setAttribute('aria-label', isOpening ? 'Menü bezárása' : 'Menü megnyitása');
+        headerMenu.classList.toggle('is-open', isOpening);
+    });
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && menuToggle.getAttribute('aria-expanded') === 'true') {
+            menuToggle.setAttribute('aria-expanded', 'false');
+            menuToggle.setAttribute('aria-label', 'Menü megnyitása');
+            headerMenu.classList.remove('is-open');
+            menuToggle.focus();
+        }
+    });
+</script>
 </body>
 </html>
