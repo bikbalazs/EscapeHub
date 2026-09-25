@@ -20,4 +20,10 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\..\EscapeHub.Api\EscapeHub.Api.csproj" />
+    <ProjectReference Include="..\..\EscapeHub.Infrastructure\EscapeHub.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
