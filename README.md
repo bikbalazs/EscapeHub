@@ -1,6 +1,6 @@
 # EscapeHub
 
-Az EscapeHub egy magyar nyelvű, ASP.NET Core MVC-vel, Entity Framework Core-ral és SQLite-tal készült szabadulószoba-foglaló weboldal. A forráskódban az azonosítók és a megjegyzések angolul szerepelnek; a látogatók által látott szövegek magyarul jelennek meg.
+Az EscapeHub egy ASP.NET Core MVC-vel, Entity Framework Core-ral és SQLite-tal készült szabadulószoba-foglaló weboldal. A forráskódban az azonosítók és a megjegyzések angolul szerepelnek; a látogatók által látott szövegek magyarul jelennek meg.
 
 ## Futtatás helyben
 
@@ -46,7 +46,7 @@ dotnet run --project EscapeHub.Web --launch-profile https
 
 A felhasználók az oldalon is regisztrálhatnak. A rendszergazdai felület csak rendszergazdai jogosultságú fiókkal érhető el.
 
-## Az első verzió funkciói
+## Az weboldal funkciói
 
 - Regisztráció, bejelentkezés és kijelentkezés.
 - Aktív szobák és jövőbeli időpontok böngészése.
